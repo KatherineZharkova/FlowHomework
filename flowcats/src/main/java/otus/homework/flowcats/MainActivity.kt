@@ -1,11 +1,10 @@
 package otus.homework.flowcats
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 
 class MainActivity : AppCompatActivity() {
 
@@ -21,7 +20,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun initStateFlow(view: CatsView) {
         lifecycleScope.launchWhenStarted {
-            catsViewModel.catsFactsFlow.collect { view.populate(it) }
+            catsViewModel.catsFactsFlow.collect {
+                when (it) {
+                    is Result.Success -> view.populate(it.value)
+                    is Result.Error -> Toast.makeText(this@MainActivity, it.message, Toast.LENGTH_LONG).show()
+                }
+            }
         }
     }
 }
